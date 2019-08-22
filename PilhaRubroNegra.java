@@ -56,7 +56,7 @@ public class PilhaRubroNegra<Objeto> implements Pilha<Objeto>{
 				//Trabalhar nesse algoritmo abaixo
 				//Como passar pilha preta para um array maiors EPilhaVazia{
 		if(isEmptyPreta()){
-			throw new EPilhaVazia("A pilha preta esta vazia");
+			throw new EPilhaVazia("topPreta() -> A pilha preta esta vazia");
 		}
 
 		return this.array[topPreta];
@@ -64,7 +64,7 @@ public class PilhaRubroNegra<Objeto> implements Pilha<Objeto>{
 
 	public Objeto topVermelha() throws EPilhaVazia{
 		if(isEmptyVermelha()){
-			throw new EPilhaVazia("A pilha vermelha esta vazia");
+			throw new EPilhaVazia("topVermelha() -> A pilha vermelha esta vazia");
 		}
 
 		return this.array[topVermelha];
@@ -74,28 +74,28 @@ public class PilhaRubroNegra<Objeto> implements Pilha<Objeto>{
 		this.tamVermelha++;
 		this.topVermelha++;
 
-		if(array[topVermelha] != null){
+		if(array[topVermelha] != null || tamVermelha == this.capacidade){
 			int capacidadeAnterior = this.capacidade;
-			capacidadeAnterior--;
+			int topPretaAnterior = this.topPreta;
 
-				this.capacidade=this.capacidade*2; //Estratégia de duplicação
-				Objeto substituto[] = (Objeto[]) new Object[capacidade];
+			this.capacidade=this.capacidade*2; //Estratégia de duplicação
+			Objeto substituto[] = (Objeto[]) new Object[capacidade];
 
-				for(int i = 0; i < this.tamVermelha; i++){
-					substituto[i] = array[i]; //Correto
-				}
+			for(int i = 0; i < this.tamVermelha; i++){
+				substituto[i] = array[i]; //Correto
+			}
 
-				this.topPreta = (this.capacidade-this.tamPreta);
-				for(int i = (this.capacidade-1); i >= this.topPreta; i--){
-					substituto[i] = array[capacidadeAnterior];
-					capacidadeAnterior--;
-				}
+			int counter = 0;
 
-				array = (Objeto[]) new Object[capacidade];
+			this.topPreta = (this.capacidade-this.tamPreta);
 
-				for(int i = 0; i < this.capacidade; i++){
-						array[i] = substituto[i];
-				}
+			for(int i = topPreta; i < this.capacidade; i++){
+				int w = topPretaAnterior+counter;
+				substituto[i] = array[w];
+				counter++;
+			}
+
+			array = substituto;
 		}
 
 		array[topVermelha] = o;
@@ -106,28 +106,30 @@ public class PilhaRubroNegra<Objeto> implements Pilha<Objeto>{
 		this.tamPreta++;
 		this.topPreta--;
 
-		if(array[topPreta] != null){
+		if(array[topPreta] != null || tamPreta == this.capacidade){
 			int capacidadeAnterior = this.capacidade;
-			capacidadeAnterior--;
+			int topPretaAnterior = this.topPreta;
 
-				this.capacidade=this.capacidade*2; //Estratégia de duplicação
-				Objeto substituto[] = (Objeto[]) new Object[capacidade];
+			this.capacidade=this.capacidade*2; //Estratégia de duplicação
+			Objeto substituto[] = (Objeto[]) new Object[capacidade];
 
-				for(int i = 0; i < this.tamVermelha; i++){
-					substituto[i] = array[i]; //Correto
-				}
+			for(int i = 0; i < this.tamVermelha; i++){
+				substituto[i] = array[i]; //Correto
+			}
 
-				this.topPreta = (this.capacidade-this.tamPreta);
-				for(int i = (this.capacidade-1); i >= this.topPreta; i--){
-					substituto[i] = array[capacidadeAnterior];
-					capacidadeAnterior--;
-				}
+			int counter = 0;
 
-				array = (Objeto[]) new Object[capacidade];
+			this.topPreta = (this.capacidade-this.tamPreta);
 
-				for(int i = 0; i < this.capacidade; i++){
-						array[i] = substituto[i];
-				}
+			for(int i = topPreta; i < this.capacidade; i++){
+				int w = topPretaAnterior+counter;
+				substituto[i] = array[w];
+				counter++;
+			}
+
+			array = substituto;
+
+			this.array = substituto;
 		}
 
 		this.array[topPreta] = o;
@@ -135,6 +137,35 @@ public class PilhaRubroNegra<Objeto> implements Pilha<Objeto>{
 
 	public Objeto popVermelha() throws EPilhaVazia{
 		Objeto element;
+
+		if(isEmptyVermelha()){
+			throw new EPilhaVazia("popVermelha() -> A pilha vermelha está vazia");
+		}
+
+		if((tamVermelha+tamPreta) == (this.capacidade)/2){
+			int novaCapacidade = this.capacidade/2;
+			int novoTopPreta = novaCapacidade - tamPreta;
+			this.capacidade = novaCapacidade;
+
+			Objeto substituto[] = (Objeto[]) new Object[novaCapacidade];
+
+			for(int i = 0; i < tamVermelha; i++){
+				substituto[i] = array[i];
+			}
+
+			int counter = 0;
+
+			for(int i = novoTopPreta; i < novaCapacidade; i++){
+				int w = this.topPreta+counter;
+				substituto[i] = array[w];
+				counter++;
+			}
+
+			this.topPreta = novoTopPreta;
+
+			array = substituto;
+
+		}
 
 		element = array[topVermelha];
 		array[topVermelha] = null;
@@ -147,6 +178,35 @@ public class PilhaRubroNegra<Objeto> implements Pilha<Objeto>{
 
 	public Objeto popPreta() throws EPilhaVazia{
 		Objeto element;
+
+		if(isEmptyPreta()){
+			throw new EPilhaVazia("popPreta() -> A pilha preta está vazia!");
+		}
+
+		if((tamVermelha+tamPreta) == (this.capacidade)/2){
+			int novaCapacidade = this.capacidade/2;
+			int novoTopPreta = novaCapacidade - tamPreta;
+			this.capacidade = novaCapacidade;
+
+			Objeto substituto[] = (Objeto[]) new Object[novaCapacidade];
+
+			for(int i = 0; i < tamVermelha; i++){
+				substituto[i] = array[i];
+			}
+
+			int counter = 0;
+
+			for(int i = novoTopPreta; i < novaCapacidade; i++){
+				int w = this.topPreta+counter;
+				substituto[i] = array[w];
+				counter++;
+			}
+
+			this.topPreta = novoTopPreta;
+
+			array = substituto;
+
+		}
 
 		element = array[topPreta];
 
@@ -164,6 +224,16 @@ public class PilhaRubroNegra<Objeto> implements Pilha<Objeto>{
 		for(int i = 0; i <= topVermelha; i++){
 			System.out.print(array[i]+" ");
 		}
+		System.out.println("");
+	}
+
+	public void mostrarTudo(){
+		System.out.println("");
+
+		for(int i = 0; i < this.capacidade; i++){
+			System.out.print(array[i]+" ");
+		}
+
 		System.out.println("");
 	}
 
